@@ -1,8 +1,9 @@
 # Python
-.py[co]
-.virtualenv/
+__pycache__
+venv
 
-# Eclipse
-.project
-.pydevproject
-.settings/
+# IDE
+.vscode
+
+# Mac
+.DS_Store
