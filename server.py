@@ -47,7 +47,8 @@ async def view_log(websocket, path):
 
             content = ''.join(deque(f, NUM_LINES))
             content = conv.convert(content, full=False)
-            await websocket.send(content)
+            # not response to client, just send the new lines
+            # await websocket.send(content)
 
             if tail:
                 last_heartbeat = time.time()
@@ -55,9 +56,12 @@ async def view_log(websocket, path):
                     content = f.read()
                     if content:
                         content = conv.convert(content, full=False)
-                        await websocket.send(content)
+                        # send by line
+                        for line in content.splitlines():
+                            await websocket.send(line)
+                            await asyncio.sleep(0.1)
                     else:
-                        await asyncio.sleep(1)
+                        await asyncio.sleep(0.1)
 
                     # heartbeat
                     if time.time() - last_heartbeat > HEARTBEAT_INTERVAL:
@@ -104,8 +108,8 @@ async def serve(host: str, port: int):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--host', default='127.0.0.1')
-    parser.add_argument('--port', type=int, default=8765)
+    parser.add_argument('--host', default='0.0.0.0')
+    parser.add_argument('--port', type=int, default=5002)
     parser.add_argument('--prefix', required=True, action='append', help='Allowed directories')
     args = parser.parse_args()
 
